@@ -26,7 +26,7 @@ export default function Overview({ data }: OverviewProps) {
     const count = data.length;
     return [
       { name: 'จุดประสงค์', score: data.reduce((acc, curr) => acc + curr.objectiveScore, 0) / count, color: '#10b981' },
-      { name: 'เนื้อหา', score: data.reduce((acc, curr) => acc + curr.contentScore, 0) / count, color: '#3b82f6' },
+      { name: 'เนื้อหา', score: data.reduce((acc, curr) => acc + curr.contentScore, 0) / count, color: '#ef4444' },
       { name: 'กิจกรรม', score: data.reduce((acc, curr) => acc + curr.activityScore, 0) / count, color: '#f59e0b' },
       { name: 'สื่อ', score: data.reduce((acc, curr) => acc + curr.mediaScore, 0) / count, color: '#8b5cf6' },
       { name: 'การวัดผล', score: data.reduce((acc, curr) => acc + curr.evaluationScore, 0) / count, color: '#ec4899' },
@@ -37,7 +37,7 @@ export default function Overview({ data }: OverviewProps) {
     if (data.length === 0) return [];
     const count = data.length;
     return [
-      { name: 'ขั้นนำ', value: data.reduce((acc, curr) => acc + curr.introScore, 0) / count, color: '#60a5fa' },
+      { name: 'ขั้นนำ', value: data.reduce((acc, curr) => acc + curr.introScore, 0) / count, color: '#ef4444' },
       { name: 'ขั้นสอน', value: data.reduce((acc, curr) => acc + curr.teachingScore, 0) / count, color: '#34d399' },
       { name: 'ขั้นสรุป', value: data.reduce((acc, curr) => acc + curr.conclusionScore, 0) / count, color: '#fbbf24' },
     ];
