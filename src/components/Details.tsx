@@ -28,7 +28,7 @@ export default function Details({ data }: DetailsProps) {
     if (!selectedRecord) return [];
     return [
       { name: 'จุดประสงค์', score: selectedRecord.objectiveScore, color: '#10b981' },
-      { name: 'เนื้อหา', score: selectedRecord.contentScore, color: '#3b82f6' },
+      { name: 'เนื้อหา', score: selectedRecord.contentScore, color: '#ef4444' },
       { name: 'กิจกรรม', score: selectedRecord.activityScore, color: '#f59e0b' },
       { name: 'สื่อ', score: selectedRecord.mediaScore, color: '#8b5cf6' },
       { name: 'การวัดผล', score: selectedRecord.evaluationScore, color: '#ec4899' },
@@ -38,7 +38,7 @@ export default function Details({ data }: DetailsProps) {
   const pieData = useMemo(() => {
     if (!selectedRecord) return [];
     return [
-      { name: 'ขั้นนำ', value: selectedRecord.introScore, color: '#60a5fa' },
+      { name: 'ขั้นนำ', value: selectedRecord.introScore, color: '#ef4444' },
       { name: 'ขั้นสอน', value: selectedRecord.teachingScore, color: '#34d399' },
       { name: 'ขั้นสรุป', value: selectedRecord.conclusionScore, color: '#fbbf24' },
     ];
