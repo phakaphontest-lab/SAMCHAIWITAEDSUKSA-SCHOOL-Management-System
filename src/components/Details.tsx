@@ -15,15 +15,13 @@ import {
 } from 'recharts';
 import { User, Calendar, MapPin, Hash } from 'lucide-react';
 import { Language, translations } from '@/src/lib/i18n';
-import EnglishSheetConnect from './EnglishSheetConnect';
 
 interface DetailsProps {
   data: SupervisionRecord[];
   lang: Language;
-  onSheetConnected: () => void;
 }
 
-export default function Details({ data, lang, onSheetConnected }: DetailsProps) {
+export default function Details({ data, lang }: DetailsProps) {
   const t = translations[lang].details;
   const c = translations[lang].charts;
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -61,11 +59,9 @@ export default function Details({ data, lang, onSheetConnected }: DetailsProps) 
           <h2 className="text-xl sm:text-2xl font-bold text-slate-800">{t.title}</h2>
           <p className="text-sm sm:text-base text-slate-500">{t.subtitle}</p>
         </div>
-        {lang === 'en' ? (
-          <EnglishSheetConnect lang={lang} onSheetConnected={onSheetConnected} />
-        ) : (
-          <div className="p-12 text-center text-slate-400">{t.empty}</div>
-        )}
+        <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm p-12 text-center text-slate-400 italic">
+          {t.empty}
+        </div>
       </div>
     );
   }

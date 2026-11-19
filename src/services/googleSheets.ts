@@ -22,38 +22,16 @@ export interface SupervisionRecord {
   averageScore: number;
 }
 
-const THAI_SHEET_ID = '1D8fic9UPVys93wxSVOlC0aIyNdTzxlFJtq27MMR6jc0';
-const ENGLISH_CSV_PATH = '/assets/aistudio/Teaching_Supervision_Form______________f0b2918c';
-const ENGLISH_SHEET_STORAGE_KEY = 'english_supervision_sheet_url';
-
-export function parseGoogleSheetUrl(input: string): { sheetId: string; gid?: string } | null {
-  const trimmed = input.trim();
-  if (!trimmed) return null;
-
-  const idMatch = trimmed.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
-  if (!idMatch) return null;
-
-  const gidMatch = trimmed.match(/[?#&]gid=(\d+)/);
-  return {
-    sheetId: idMatch[1],
-    gid: gidMatch?.[1],
-  };
-}
-
-export function getSavedEnglishSheetUrl(): string {
-  if (typeof window === 'undefined') return '';
-  return window.localStorage.getItem(ENGLISH_SHEET_STORAGE_KEY) ?? '';
-}
-
-export function saveEnglishSheetUrl(url: string): void {
-  if (typeof window === 'undefined') return;
-  const trimmed = url.trim();
-  if (trimmed) {
-    window.localStorage.setItem(ENGLISH_SHEET_STORAGE_KEY, trimmed);
-  } else {
-    window.localStorage.removeItem(ENGLISH_SHEET_STORAGE_KEY);
-  }
-}
+const SHEET_CONFIG: Record<Language, { sheetId: string; hasThirdEvalItem: boolean }> = {
+  th: {
+    sheetId: '1D8fic9UPVys93wxSVOlC0aIyNdTzxlFJtq27MMR6jc0',
+    hasThirdEvalItem: false,
+  },
+  en: {
+    sheetId: '1KrH9wIPHbRo5ck_nD4Uil01c-UzK6x6Zh8f0dBcsIDQ',
+    hasThirdEvalItem: true,
+  },
+};
 
 function parseGvizDate(rawValue: unknown, formattedValue?: string): { display: string; timestamp: number } {
   if (typeof rawValue === 'string') {
@@ -112,8 +90,14 @@ function mapRowValues(
   const teacher = getString(3);
   const { display: date, timestamp: dateTimestamp } = parseGvizDate(cells[1]?.v, cells[1]?.f);
 
-  // Skip completely empty rows
+  // Skip empty rows or accidental header rows
   if (!supervisor && !teacher && !date) return null;
+  if (
+    (supervisor === 'Supervisor' && date === 'Date') ||
+    (supervisor === 'ผู้นิเทศ' && date === 'วันที่นิเทศ')
+  ) {
+    return null;
+  }
 
   // Aspect 1: Objectives (1.1, 1.2 -> cols 6, 7)
   const objectiveScore = averageOf([getNumber(6), getNumber(7)]);
@@ -141,7 +125,7 @@ function mapRowValues(
 
   // Aspect 5: Assessment & Evaluation
   // Thai sheet: 5.1, 5.2 (cols 20, 21)
-  // English sheet/CSV: 5.1, 5.2, 5.3 (cols 20, 21, 22)
+  // English sheet: 5.1, 5.2, 5.3 (cols 20, 21, 22)
   const evaluationScore = hasThirdEvalItem
     ? averageOf([getNumber(20), getNumber(21), getNumber(22)])
     : averageOf([getNumber(20), getNumber(21)]);
@@ -174,118 +158,33 @@ function mapRowValues(
   };
 }
 
-function parseCsvRows(csvText: string): string[][] {
-  const rows: string[][] = [];
-  let currentRow: string[] = [];
-  let currentField = '';
-  let inQuotes = false;
-
-  for (let i = 0; i < csvText.length; i++) {
-    const char = csvText[i];
-    const nextChar = csvText[i + 1];
-
-    if (inQuotes) {
-      if (char === '"' && nextChar === '"') {
-        currentField += '"';
-        i++;
-      } else if (char === '"') {
-        inQuotes = false;
-      } else {
-        currentField += char;
-      }
-    } else {
-      if (char === '"') {
-        inQuotes = true;
-      } else if (char === ',') {
-        currentRow.push(currentField);
-        currentField = '';
-      } else if (char === '\r' && nextChar === '\n') {
-        currentRow.push(currentField);
-        rows.push(currentRow);
-        currentRow = [];
-        currentField = '';
-        i++;
-      } else if (char === '\n' || char === '\r') {
-        currentRow.push(currentField);
-        rows.push(currentRow);
-        currentRow = [];
-        currentField = '';
-      } else {
-        currentField += char;
-      }
-    }
-  }
-
-  if (currentField.length > 0 || currentRow.length > 0) {
-    currentRow.push(currentField);
-    rows.push(currentRow);
-  }
-
-  return rows;
-}
-
-async function fetchFromGvizSheet(
-  sheetId: string,
-  gid: string | undefined,
-  hasThirdEvalItem: boolean
-): Promise<SupervisionRecord[]> {
-  const gidParam = gid ? `&gid=${gid}` : '';
-  const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json${gidParam}`;
-  const response = await fetch(url);
-  const text = await response.text();
-
-  const startIndex = text.indexOf('{');
-  const endIndex = text.lastIndexOf('}');
-  if (startIndex === -1 || endIndex === -1) {
-    throw new Error('Unexpected Google Sheets response format');
-  }
-
-  const jsonData = JSON.parse(text.substring(startIndex, endIndex + 1));
-  const rows = jsonData?.table?.rows ?? [];
-
-  return rows
-    .map((row: { c?: Array<{ v?: unknown; f?: string } | null> }) => {
-      const cells = (row.c ?? []).map((cell) => ({
-        v: cell?.v ?? '',
-        f: cell?.f,
-      }));
-      return mapRowValues(cells, hasThirdEvalItem);
-    })
-    .filter((record: SupervisionRecord | null): record is SupervisionRecord => record !== null);
-}
-
-async function fetchFromEnglishCsv(): Promise<SupervisionRecord[]> {
-  const response = await fetch(ENGLISH_CSV_PATH);
-  if (!response.ok) return [];
-  const csvText = await response.text();
-  const parsedRows = parseCsvRows(csvText);
-
-  if (parsedRows.length <= 1) return [];
-
-  // Skip header row (index 0)
-  return parsedRows
-    .slice(1)
-    .map((row) => {
-      const cells = row.map((value) => ({ v: value, f: value }));
-      return mapRowValues(cells, true);
-    })
-    .filter((record): record is SupervisionRecord => record !== null);
-}
-
 export async function fetchSupervisionData(lang: Language = 'th'): Promise<SupervisionRecord[]> {
   try {
-    if (lang === 'en') {
-      const savedUrl = getSavedEnglishSheetUrl();
-      const parsed = parseGoogleSheetUrl(savedUrl);
-      if (parsed) {
-        return await fetchFromGvizSheet(parsed.sheetId, parsed.gid, true);
-      }
-      return await fetchFromEnglishCsv();
+    const { sheetId, hasThirdEvalItem } = SHEET_CONFIG[lang];
+    const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&headers=1`;
+    const response = await fetch(url);
+    const text = await response.text();
+
+    const startIndex = text.indexOf('{');
+    const endIndex = text.lastIndexOf('}');
+    if (startIndex === -1 || endIndex === -1) {
+      throw new Error('Unexpected Google Sheets response format');
     }
 
-    return await fetchFromGvizSheet(THAI_SHEET_ID, undefined, false);
+    const jsonData = JSON.parse(text.substring(startIndex, endIndex + 1));
+    const rows = jsonData?.table?.rows ?? [];
+
+    return rows
+      .map((row: { c?: Array<{ v?: unknown; f?: string } | null> }) => {
+        const cells = (row.c ?? []).map((cell) => ({
+          v: cell?.v ?? '',
+          f: cell?.f,
+        }));
+        return mapRowValues(cells, hasThirdEvalItem);
+      })
+      .filter((record: SupervisionRecord | null): record is SupervisionRecord => record !== null);
   } catch (error) {
-    console.error('Error fetching supervision data:', error);
+    console.error('Error fetching Google Sheets data:', error);
     return [];
   }
 }

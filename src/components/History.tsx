@@ -2,15 +2,13 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { SupervisionRecord } from '../services/googleSheets';
 import { cn } from '@/src/lib/utils';
 import { Language, translations } from '@/src/lib/i18n';
-import EnglishSheetConnect from './EnglishSheetConnect';
 
 interface HistoryProps {
   data: SupervisionRecord[];
   lang: Language;
-  onSheetConnected: () => void;
 }
 
-export default function HistoryTable({ data, lang, onSheetConnected }: HistoryProps) {
+export default function HistoryTable({ data, lang }: HistoryProps) {
   const t = translations[lang].history;
   const [filterSupervisor, setFilterSupervisor] = useState('');
   const [filterLevel, setFilterLevel] = useState('');
@@ -53,11 +51,7 @@ export default function HistoryTable({ data, lang, onSheetConnected }: HistoryPr
         <p className="text-sm sm:text-base text-slate-500">{t.subtitle}</p>
       </div>
 
-      {lang === 'en' && data.length === 0 ? (
-        <EnglishSheetConnect lang={lang} onSheetConnected={onSheetConnected} />
-      ) : (
-        <>
-          {/* Filters */}
+      {/* Filters */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 bg-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm">
             <div className="space-y-1.5 sm:space-y-2">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">
@@ -225,8 +219,6 @@ export default function HistoryTable({ data, lang, onSheetConnected }: HistoryPr
               </table>
             </div>
           </div>
-        </>
-      )}
     </div>
   );
 }

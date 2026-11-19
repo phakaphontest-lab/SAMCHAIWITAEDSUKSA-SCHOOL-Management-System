@@ -3,15 +3,13 @@ import { SupervisionRecord } from '../services/googleSheets';
 import { Star, Layers, UserCheck, TrendingUp, Calendar } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { Language, translations } from '@/src/lib/i18n';
-import EnglishSheetConnect from './EnglishSheetConnect';
 
 interface DashboardProps {
   data: SupervisionRecord[];
   lang: Language;
-  onSheetConnected: () => void;
 }
 
-export default function Dashboard({ data, lang, onSheetConnected }: DashboardProps) {
+export default function Dashboard({ data, lang }: DashboardProps) {
   const t = translations[lang].dashboard;
 
   const stats = useMemo(() => {
@@ -90,10 +88,7 @@ export default function Dashboard({ data, lang, onSheetConnected }: DashboardPro
         ))}
       </div>
 
-      {lang === 'en' && data.length === 0 ? (
-        <EnglishSheetConnect lang={lang} onSheetConnected={onSheetConnected} />
-      ) : (
-        /* Recent Table / Mobile Cards */
+      {/* Recent Table / Mobile Cards */}
         <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
           <div className="p-4 sm:p-6 border-b border-slate-100 flex items-center justify-between">
             <h3 className="font-bold text-slate-800 flex items-center gap-2 text-sm sm:text-base">
@@ -202,7 +197,6 @@ export default function Dashboard({ data, lang, onSheetConnected }: DashboardPro
             </table>
           </div>
         </div>
-      )}
     </div>
   );
 }

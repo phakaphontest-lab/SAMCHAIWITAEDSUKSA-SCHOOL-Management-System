@@ -86,16 +86,6 @@ export const translations = {
       scoreLabel: 'คะแนน',
       avgLabel: 'คะแนนเฉลี่ย',
     },
-    englishSheet: {
-      noDataTitle: 'ยังไม่มีข้อมูลการตอบกลับในชุดข้อมูลภาษาอังกฤษ',
-      noDataDesc:
-        'ไฟล์ CSV ที่แนบมามีเฉพาะหัวข้อคอลัมน์ หรือยังไม่มีการบันทึกข้อมูลจากแบบฟอร์มภาษาอังกฤษ คุณสามารถเชื่อมต่อลิงก์ Google Sheets ของแบบฟอร์มภาษาอังกฤษเพื่อดึงข้อมูลแบบเรียลไทม์ได้ทันที',
-      placeholder: 'วางลิงก์ Google Sheets ภาษาอังกฤษ (https://docs.google.com/spreadsheets/d/...)',
-      connectBtn: 'เชื่อมต่อ Google Sheet',
-      resetBtn: 'ใช้ไฟล์ CSV ที่แนบมา',
-      invalidUrl: 'รูปแบบลิงก์ Google Sheets ไม่ถูกต้อง',
-      connectedLabel: 'เชื่อมต่อ Google Sheet ภาษาอังกฤษแล้ว',
-    },
   },
   en: {
     brandTitle: 'Supervision',
@@ -181,16 +171,6 @@ export const translations = {
       conclusion: 'Conclusion',
       scoreLabel: 'Score',
       avgLabel: 'Average',
-    },
-    englishSheet: {
-      noDataTitle: 'No English Supervision Responses Yet',
-      noDataDesc:
-        'The attached English CSV currently contains column headers with 0 responses. Submit a response via the Supervision Form or link your English Google Sheet URL below to fetch live data.',
-      placeholder: 'Paste English Google Sheets URL (https://docs.google.com/spreadsheets/d/...)',
-      connectBtn: 'Connect Google Sheet',
-      resetBtn: 'Use Attached CSV',
-      invalidUrl: 'Invalid Google Sheets URL',
-      connectedLabel: 'Connected to English Google Sheet',
     },
   },
 } as const;

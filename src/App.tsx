@@ -63,13 +63,13 @@ export default function App() {
       case 'form':
         return <SupervisionForm lang={lang} />;
       case 'history':
-        return <HistoryTable data={data} lang={lang} onSheetConnected={loadData} />;
+        return <HistoryTable data={data} lang={lang} />;
       case 'dashboard':
-        return <Dashboard data={data} lang={lang} onSheetConnected={loadData} />;
+        return <Dashboard data={data} lang={lang} />;
       case 'details':
-        return <Details data={data} lang={lang} onSheetConnected={loadData} />;
+        return <Details data={data} lang={lang} />;
       case 'overview':
-        return <Overview data={data} lang={lang} onSheetConnected={loadData} />;
+        return <Overview data={data} lang={lang} />;
       default:
         return <SupervisionForm lang={lang} />;
     }
