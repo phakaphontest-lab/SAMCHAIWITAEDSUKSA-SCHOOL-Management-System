@@ -1,0 +1,5 @@
+{
+  "name": "ระบบนิเทศการจัดการเรียนการสอน",
+  "description": "ระบบติดตามและสรุปผลการนิเทศการจัดการเรียนการสอน เชื่อมต่อข้อมูลจาก Google Sheets และ Google Forms",
+  "requestFramePermissions": []
+}
